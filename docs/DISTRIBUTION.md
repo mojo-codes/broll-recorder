@@ -19,10 +19,22 @@ Wenn `.github/workflows/release.yml` im Repo aktiv ist, baut GitHub Actions dana
 
 Hinweis: Das lokale Workflow-File braucht beim Push einen GitHub-Token mit `workflow`-Scope.
 
+Der GitHub-Workflow baut:
+
+- macOS als Universal-Build auf `macos-15-intel`
+- Windows als x64-Installer
+
 ## Manuell von diesem Mac veröffentlichen
 
 ```bash
 GH_TOKEN=<github-token> npm run release:github
+```
+
+Für einen manuellen Plattform-Build:
+
+```bash
+npm run release:github:mac
+npm run release:github:win
 ```
 
 ## Download für Luisa

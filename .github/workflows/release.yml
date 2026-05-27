@@ -11,12 +11,20 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.os }}
+    name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        include:
+          - name: macOS Universal
+            os: macos-15-intel
+            build-command: npm run release:github:mac
+          - name: Windows x64
+            os: windows-latest
+            build-command: npm run release:github:win
 
     steps:
       - name: Checkout
@@ -32,6 +40,6 @@ jobs:
         run: npm ci
 
       - name: Build and publish
-        run: npm run release:github
+        run: ${{ matrix.build-command }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

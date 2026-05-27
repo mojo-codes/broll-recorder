@@ -62,10 +62,11 @@ function createControlWindow(): void {
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
   controlWindow.setContentProtection(true);
+  hardenWindow(controlWindow);
 
   if (devServerUrl) {
     void controlWindow.loadURL(devServerUrl);
@@ -102,10 +103,11 @@ function createOverlayWindow(formatId: FormatPresetId): BrowserWindow {
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
   window.setContentProtection(true);
+  hardenWindow(window);
 
   window.setAlwaysOnTop(true, "screen-saver");
   window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
@@ -144,11 +146,12 @@ function createRecordingFrameWindow(): BrowserWindow {
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
 
   window.setContentProtection(true);
+  hardenWindow(window);
   window.setIgnoreMouseEvents(true, { forward: true });
   window.setAlwaysOnTop(true, "screen-saver");
   window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
@@ -194,10 +197,11 @@ function createRecordingControlWindow(): BrowserWindow {
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
   window.setContentProtection(true);
+  hardenWindow(window);
 
   window.setAlwaysOnTop(true, "screen-saver");
   window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
@@ -214,6 +218,13 @@ function createRecordingControlWindow(): BrowserWindow {
 
   recordingControlWindow = window;
   return window;
+}
+
+function hardenWindow(window: BrowserWindow): void {
+  window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  window.webContents.on("will-navigate", (event) => {
+    event.preventDefault();
+  });
 }
 
 function showOverlay(formatId: FormatPresetId): OverlayState {
@@ -632,7 +643,11 @@ function registerHotkeys(settings: AppSettings): void {
     controlWindow?.webContents.send("shortcut:frame-toggle");
   });
 
-  if (!recordRegistered || !frameRegistered) {
+  const pauseRegistered = globalShortcut.register(settings.hotkeys.pauseToggle, () => {
+    controlWindow?.webContents.send("recording:pause-toggle");
+  });
+
+  if (!recordRegistered || !frameRegistered || !pauseRegistered) {
     controlWindow?.webContents.send("app:notice", "Ein Hotkey ist bereits belegt.");
   }
 }

@@ -300,7 +300,8 @@ button:disabled {
   gap: 7px;
 }
 
-.field input {
+.field input,
+.shortcut-select select {
   width: 100%;
   min-width: 0;
   border: 1px solid #d6d0c4;
@@ -311,7 +312,8 @@ button:disabled {
   outline: none;
 }
 
-.field input:focus {
+.field input:focus,
+.shortcut-select select:focus {
   border-color: #0e7c72;
   box-shadow: 0 0 0 3px rgba(14, 124, 114, 0.14);
 }
@@ -554,6 +556,22 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.shortcut-select {
+  display: grid;
+  gap: 6px;
+}
+
+.shortcut-select span {
+  color: #3f3a33;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.shortcut-select small {
+  color: #746f65;
+  font-size: 12px;
 }
 
 .toggle-row {

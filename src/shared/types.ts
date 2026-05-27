@@ -35,6 +35,7 @@ export interface AppSettings {
   defaults: NameFields;
   hotkeys: {
     recordToggle: string;
+    pauseToggle: string;
     frameToggle: string;
   };
   showCursor: boolean;

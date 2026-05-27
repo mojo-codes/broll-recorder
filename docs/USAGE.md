@@ -23,11 +23,11 @@ release/mac/B-Roll Recorder.app
 
 1. Format wählen: `Handy`, `Breit` oder `Text groß`.
 2. Qualität wählen: `Normal`, `Text scharf` oder `Flüssig`.
-3. Name-Felder setzen.
+3. `Name`, `Was ist zu sehen?` und `Was passiert?` setzen.
 4. Speicherort prüfen.
 5. `Rahmen setzen`, den Rahmen positionieren und skalieren.
 6. Im Overlay `Fertig` klicken, dann `Aufnehmen` starten.
-7. Nach dem Countdown aufnehmen, danach `Stop`.
+7. Nach dem Countdown aufnehmen, danach im schwebenden Fenster `Pause`, `Weiter` oder `Stop` nutzen.
 
 Die App exportiert eine H.264-MP4 und zeigt Pfad, Auflösung, FPS, Dauer, Dateigröße und Quellmodus.
 
@@ -37,8 +37,9 @@ Die App exportiert eine H.264-MP4 und zeigt Pfad, Auflösung, FPS, Dauer, Dateig
   `/Users/mojo/Social Media Growth/Recordings Social Media.nosync/Broll/_inbox/new_unsorted`
 - Default-Qualität: `Text scharf`
 - Default-Hotkeys:
-  - Start/Stop: `CommandOrControl+Shift+R`
-  - Rahmen: `CommandOrControl+Shift+F`
+  - Start/Stop: `Cmd/Ctrl + Shift + R`
+  - Pause/Weiter: `Cmd/Ctrl + Shift + P`
+  - Rahmen setzen/anzeigen: `Cmd/Ctrl + Shift + F`
 
 ## Hinweise
 
@@ -47,7 +48,7 @@ Die App exportiert eine H.264-MP4 und zeigt Pfad, Auflösung, FPS, Dauer, Dateig
 - `Breit` ist für Website-/Desktop-B-Roll und Split-Screen-Quellen.
 - `Text groß` ist für textlastige Proof-Screens im oberen Remotion-Bereich.
 - Das Rahmen-Overlay ist transparent und kann mit `Fertig`, `Enter` oder `Esc` geschlossen werden.
-- Der sichtbare Rahmen wird vor der Aufnahme ausgeblendet.
+- Der sichtbare Rahmen wird vor der Aufnahme ausgeblendet und kann während der Aufnahme wieder ein- oder ausgeblendet werden.
 - Wenn die Quelle kleiner als das Exportformat ist, wird der Quellmodus als `scaled` angezeigt.
 - Die URL-/Web-Capture-Ansicht ist noch Phase 2.
 

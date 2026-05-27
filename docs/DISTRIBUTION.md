@@ -11,7 +11,7 @@ Luisa installiert die App einmal über einen GitHub-Release-Download. Danach pr�
 3. Tag setzen und pushen:
 
 ```bash
-git tag v0.1.1
+git tag v0.1.3
 git push origin main --tags
 ```
 
@@ -24,18 +24,16 @@ Der GitHub-Workflow baut:
 - macOS als x64-Build auf `macos-15-intel`
 - Windows als x64-Installer
 
-## Manuell von diesem Mac veröffentlichen
+## Manuell veröffentlichen
 
-```bash
-GH_TOKEN=<github-token> npm run release:github
-```
-
-Für einen manuellen Plattform-Build:
+Für ein manuelles Plattform-Publishing:
 
 ```bash
 npm run release:github:mac
 npm run release:github:win
 ```
+
+Manuelles Publizieren sollte nur mit einem lokal konfigurierten GitHub-Login passieren. Keine Tokens in Code, Docs oder App-Bundles einbauen.
 
 ## Download für Luisa
 
@@ -46,7 +44,7 @@ Für Auto-Updates müssen die GitHub Releases öffentlich erreichbar sein. Bei p
 
 ## Professionelle Signierung
 
-Für wirklich reibungslose Installation auf fremden Rechnern braucht macOS eine Apple Developer ID mit Notarization. Windows funktioniert technisch ohne Zertifikat, zeigt dann aber häufiger SmartScreen-Warnungen; ein Code-Signing-Zertifikat reduziert das.
+Für wirklich reibungslose Installation auf fremden Rechnern braucht macOS eine Apple Developer ID mit Hardened Runtime, Notarization und Stapling. Windows funktioniert technisch ohne Zertifikat, zeigt dann aber häufiger SmartScreen-Warnungen; ein Code-Signing-Zertifikat reduziert das.
 
 ## Diagnose
 

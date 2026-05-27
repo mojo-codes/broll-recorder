@@ -25,6 +25,7 @@ let mockSettings: AppSettings = {
   },
   hotkeys: {
     recordToggle: "CommandOrControl+Shift+R",
+    pauseToggle: "CommandOrControl+Shift+P",
     frameToggle: "CommandOrControl+Shift+F"
   },
   showCursor: true,

@@ -29,6 +29,24 @@ import { recordToFile, type RecordingControls } from "./recording";
 
 type RecordingState = "idle" | "countdown" | "recording" | "exporting";
 
+const RECORD_HOTKEYS = [
+  { value: "CommandOrControl+Shift+R", label: "Cmd/Ctrl + Shift + R" },
+  { value: "CommandOrControl+Alt+R", label: "Cmd/Ctrl + Alt + R" },
+  { value: "F8", label: "F8" }
+];
+
+const PAUSE_HOTKEYS = [
+  { value: "CommandOrControl+Shift+P", label: "Cmd/Ctrl + Shift + P" },
+  { value: "CommandOrControl+Alt+P", label: "Cmd/Ctrl + Alt + P" },
+  { value: "F9", label: "F9" }
+];
+
+const FRAME_HOTKEYS = [
+  { value: "CommandOrControl+Shift+F", label: "Cmd/Ctrl + Shift + F" },
+  { value: "CommandOrControl+Alt+F", label: "Cmd/Ctrl + Alt + F" },
+  { value: "F7", label: "F7" }
+];
+
 export function App(): JSX.Element {
   const [appState, setAppState] = useState<AppState | null>(null);
   const [formatId, setFormatId] = useState<FormatPresetId>("vertical");
@@ -85,7 +103,11 @@ export function App(): JSX.Element {
       }
     });
     const cleanupFrame = window.broll.onShortcutFrameToggle(() => {
-      void window.broll.showOverlay(formatIdRef.current);
+      if (recordingStateRef.current === "recording") {
+        void window.broll.requestToggleRecordingFrame();
+      } else if (recordingStateRef.current === "idle") {
+        void window.broll.showOverlay(formatIdRef.current);
+      }
     });
     const cleanupOverlayHidden = window.broll.onOverlayHidden((state) => {
       setFrameReady(true);
@@ -465,6 +487,34 @@ function TextInput({
   );
 }
 
+function ShortcutSelect({
+  label,
+  description,
+  value,
+  options,
+  onChange
+}: {
+  label: string;
+  description: string;
+  value: string;
+  options: Array<{ value: string; label: string }>;
+  onChange: (value: string) => void;
+}): JSX.Element {
+  return (
+    <label className="shortcut-select">
+      <span>{label}</span>
+      <small>{description}</small>
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function OutputPicker({
   outputDir,
   onChoose
@@ -552,32 +602,58 @@ function SettingsPanel({
         </header>
 
         <div className="settings-form">
-          <OutputPicker outputDir={settings.outputDir} onChoose={onChooseOutput} />
-          <TextInput
-            label="Dateiname"
-            value={draft.filenameTemplate}
-            onChange={(filenameTemplate) => setDraft((current) => ({ ...current, filenameTemplate }))}
-          />
-          <TextInput
-            label="Start/Stop"
-            value={draft.hotkeys.recordToggle}
-            onChange={(recordToggle) =>
-              setDraft((current) => ({
-                ...current,
-                hotkeys: { ...current.hotkeys, recordToggle }
-              }))
-            }
-          />
-          <TextInput
-            label="Rahmen"
-            value={draft.hotkeys.frameToggle}
-            onChange={(frameToggle) =>
-              setDraft((current) => ({
-                ...current,
-                hotkeys: { ...current.hotkeys, frameToggle }
-              }))
-            }
-          />
+          <section className="settings-section" aria-label="Speicherort">
+            <h3>Speicherort</h3>
+            <p>Standard-Ordner für neue Aufnahmen.</p>
+            <OutputPicker outputDir={settings.outputDir} onChoose={onChooseOutput} />
+          </section>
+
+          <section className="settings-section" aria-label="Dateiname">
+            <h3>Dateiname</h3>
+            <p>Wird aus Name, Was ist zu sehen? und Was passiert? plus Format und Datum gebaut.</p>
+          </section>
+
+          <section className="settings-section" aria-label="Tastenkombinationen">
+            <h3>Tastenkombinationen</h3>
+            <p>Auf dem Mac steht Cmd, unter Windows Ctrl.</p>
+            <ShortcutSelect
+              label="Aufnahme starten/stoppen"
+              description="Startet die Aufnahme oder stoppt sie, wenn sie läuft."
+              value={draft.hotkeys.recordToggle}
+              options={RECORD_HOTKEYS}
+              onChange={(recordToggle) =>
+                setDraft((current) => ({
+                  ...current,
+                  hotkeys: { ...current.hotkeys, recordToggle }
+                }))
+              }
+            />
+            <ShortcutSelect
+              label="Pause/weiter"
+              description="Pausiert oder setzt eine laufende Aufnahme fort."
+              value={draft.hotkeys.pauseToggle}
+              options={PAUSE_HOTKEYS}
+              onChange={(pauseToggle) =>
+                setDraft((current) => ({
+                  ...current,
+                  hotkeys: { ...current.hotkeys, pauseToggle }
+                }))
+              }
+            />
+            <ShortcutSelect
+              label="Rahmen setzen/anzeigen"
+              description="Setzt den Rahmen vor der Aufnahme; blendet ihn während der Aufnahme ein oder aus."
+              value={draft.hotkeys.frameToggle}
+              options={FRAME_HOTKEYS}
+              onChange={(frameToggle) =>
+                setDraft((current) => ({
+                  ...current,
+                  hotkeys: { ...current.hotkeys, frameToggle }
+                }))
+              }
+            />
+          </section>
+
           <label className="toggle-row">
             <input
               type="checkbox"

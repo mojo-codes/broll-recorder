@@ -15,7 +15,9 @@ git tag v0.1.1
 git push origin main --tags
 ```
 
-GitHub Actions baut danach macOS- und Windows-Artefakte und legt sie als Draft Release an. Den Draft prüfen, Release Notes ergänzen und veröffentlichen.
+Wenn `.github/workflows/release.yml` im Repo aktiv ist, baut GitHub Actions danach macOS- und Windows-Artefakte und legt sie als Draft Release an. Den Draft prüfen, Release Notes ergänzen und veröffentlichen.
+
+Hinweis: Das lokale Workflow-File braucht beim Push einen GitHub-Token mit `workflow`-Scope.
 
 ## Manuell von diesem Mac veröffentlichen
 

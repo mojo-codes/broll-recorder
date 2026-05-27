@@ -21,7 +21,7 @@ jobs:
         include:
           - name: macOS x64
             os: macos-15-intel
-            build-command: npm run release:github:mac
+            build-command: npm run dist:mac:ci
           - name: Windows x64
             os: windows-latest
             build-command: npm run release:github:win

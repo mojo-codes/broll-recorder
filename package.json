@@ -18,6 +18,8 @@
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
     "package": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
+    "dist:mac:ci": "npm run build && electron-builder --mac --x64 --publish never",
+    "dist:mac:signed-local": "test -n \"$CSC_NAME\" && npm run build && electron-builder --mac --x64 --config.mac.identity=\"$CSC_NAME\" --publish never",
     "release:github": "npm run build && electron-builder --publish always",
     "release:github:mac": "npm run build && electron-builder --mac --x64 --publish always",
     "release:github:win": "npm run build && electron-builder --win --x64 --publish always"

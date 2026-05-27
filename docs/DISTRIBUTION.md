@@ -11,7 +11,7 @@ Luisa installiert die App einmal √ºber einen GitHub-Release-Download. Danach pr√
 3. Tag setzen und pushen:
 
 ```bash
-git tag v0.1.3
+git tag v0.1.4
 git push origin main --tags
 ```
 

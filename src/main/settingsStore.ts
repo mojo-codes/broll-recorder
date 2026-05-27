@@ -50,7 +50,7 @@ export function loadSettings(): AppSettings {
 
   try {
     const raw = JSON.parse(fs.readFileSync(settingsPath, "utf8")) as Partial<AppSettings>;
-    return {
+    return normalizeSettings({
       ...defaults,
       ...raw,
       defaults: {
@@ -61,7 +61,7 @@ export function loadSettings(): AppSettings {
         ...defaults.hotkeys,
         ...raw.hotkeys
       }
-    };
+    });
   } catch {
     return defaults;
   }
@@ -69,7 +69,7 @@ export function loadSettings(): AppSettings {
 
 export function saveSettings(patch: Partial<AppSettings>): AppSettings {
   const current = loadSettings();
-  const next: AppSettings = {
+  const next = normalizeSettings({
     ...current,
     ...patch,
     defaults: {
@@ -80,9 +80,29 @@ export function saveSettings(patch: Partial<AppSettings>): AppSettings {
       ...current.hotkeys,
       ...patch.hotkeys
     }
-  };
+  });
 
   fs.mkdirSync(path.dirname(getSettingsPath()), { recursive: true });
   fs.writeFileSync(getSettingsPath(), JSON.stringify(next, null, 2));
   return next;
+}
+
+function normalizeSettings(settings: AppSettings): AppSettings {
+  return {
+    ...settings,
+    defaultFormatPreset: isFormatPresetId(settings.defaultFormatPreset)
+      ? settings.defaultFormatPreset
+      : "vertical",
+    defaultQualityPreset: isQualityPresetId(settings.defaultQualityPreset)
+      ? settings.defaultQualityPreset
+      : "sharp-ui"
+  };
+}
+
+function isFormatPresetId(value: unknown): value is AppSettings["defaultFormatPreset"] {
+  return value === "vertical" || value === "wide";
+}
+
+function isQualityPresetId(value: unknown): value is AppSettings["defaultQualityPreset"] {
+  return value === "standard" || value === "sharp-ui";
 }

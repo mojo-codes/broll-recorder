@@ -6,8 +6,8 @@ The app helps capture reusable screen clips for TikTok, Instagram, LinkedIn and 
 
 ## Features
 
-- Preset capture formats: `Handy` (`1080x1920`), `Breit` (`1920x1080`) and `Text groß` (`1080x850`).
-- Quality presets: `Normal`, `Text scharf` and `Flüssig`.
+- Preset capture formats: `Handy` (`1080x1920`) and `Breit` (`1920x1080`).
+- Quality presets: `Normal` and `Beste Qualität`.
 - Movable and resizable recording frame with locked aspect ratio.
 - Floating recording controls with timer, pause/resume, stop and frame toggle.
 - H.264 MP4 export for easy use in video editors and Remotion.

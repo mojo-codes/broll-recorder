@@ -1,5 +1,5 @@
-export type FormatPresetId = "vertical" | "wide" | "upper-proof";
-export type QualityPresetId = "standard" | "sharp-ui" | "smooth";
+export type FormatPresetId = "vertical" | "wide";
+export type QualityPresetId = "standard" | "sharp-ui";
 
 export interface FormatPreset {
   id: FormatPresetId;

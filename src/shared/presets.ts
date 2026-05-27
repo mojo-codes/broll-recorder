@@ -18,15 +18,6 @@ export const FORMAT_PRESETS: FormatPreset[] = [
     width: 1920,
     height: 1080,
     filenameToken: "wide"
-  },
-  {
-    id: "upper-proof",
-    label: "Text groß",
-    technicalLabel: "1080x850",
-    description: "Große Proof-Screens für Remotion",
-    width: 1080,
-    height: 850,
-    filenameToken: "upper-proof"
   }
 ];
 
@@ -34,26 +25,18 @@ export const QUALITY_PRESETS: QualityPreset[] = [
   {
     id: "standard",
     label: "Normal",
-    description: "30 FPS",
+    description: "30 FPS, kleinere Datei",
     fps: 30,
     videoBitsPerSecond: 16_000_000,
     exportBitrate: "16M"
   },
   {
     id: "sharp-ui",
-    label: "Text scharf",
-    description: "30 FPS, hohe Bitrate",
-    fps: 30,
-    videoBitsPerSecond: 28_000_000,
-    exportBitrate: "28M"
-  },
-  {
-    id: "smooth",
-    label: "Flüssig",
-    description: "60 FPS",
+    label: "Beste Qualität",
+    description: "60 FPS, scharfe Schrift",
     fps: 60,
-    videoBitsPerSecond: 40_000_000,
-    exportBitrate: "40M"
+    videoBitsPerSecond: 45_000_000,
+    exportBitrate: "45M"
   }
 ];
 

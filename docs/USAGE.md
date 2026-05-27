@@ -21,8 +21,8 @@ release/mac/B-Roll Recorder.app
 
 ## Aufnahme
 
-1. Format wählen: `Handy`, `Breit` oder `Text groß`.
-2. Qualität wählen: `Normal`, `Text scharf` oder `Flüssig`.
+1. Format wählen: `Handy` oder `Breit`.
+2. Qualität wählen: `Normal` oder `Beste Qualität`.
 3. `Name`, `Was ist zu sehen?` und `Was passiert?` setzen.
 4. Speicherort prüfen.
 5. `Rahmen setzen`, den Rahmen positionieren und skalieren.
@@ -35,7 +35,7 @@ Die App exportiert eine H.264-MP4 und zeigt Pfad, Auflösung, FPS, Dauer, Dateig
 
 - Default-Speicherort, wenn vorhanden:
   `/Users/mojo/Social Media Growth/Recordings Social Media.nosync/Broll/_inbox/new_unsorted`
-- Default-Qualität: `Text scharf`
+- Default-Qualität: `Beste Qualität`
 - Default-Hotkeys:
   - Start/Stop: `Cmd/Ctrl + Shift + R`
   - Pause/Weiter: `Cmd/Ctrl + Shift + P`
@@ -46,7 +46,6 @@ Die App exportiert eine H.264-MP4 und zeigt Pfad, Auflösung, FPS, Dauer, Dateig
 - Auf macOS muss Bildschirmaufnahme für die App erlaubt sein.
 - `Handy` ist für Vollbild-Szenen im Hochformat. Auf einem 16:9-Monitor wird der Quellbereich kleiner als 1080x1920 sein und hochskaliert.
 - `Breit` ist für Website-/Desktop-B-Roll und Split-Screen-Quellen.
-- `Text groß` ist für textlastige Proof-Screens im oberen Remotion-Bereich.
 - Das Rahmen-Overlay ist transparent und kann mit `Fertig`, `Enter` oder `Esc` geschlossen werden.
 - Der sichtbare Rahmen wird vor der Aufnahme ausgeblendet und kann während der Aufnahme wieder ein- oder ausgeblendet werden.
 - Wenn die Quelle kleiner als das Exportformat ist, wird der Quellmodus als `scaled` angezeigt.

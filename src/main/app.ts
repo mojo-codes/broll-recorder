@@ -50,6 +50,15 @@ let controlWindowHiddenForOverlay = false;
 
 initializeDiagnostics();
 
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
+if (!hasSingleInstanceLock) {
+  app.quit();
+}
+
+app.on("second-instance", () => {
+  focusControlWindow();
+});
+
 function createControlWindow(): void {
   controlWindow = new BrowserWindow({
     width: 1040,
@@ -77,6 +86,21 @@ function createControlWindow(): void {
   controlWindow.on("closed", () => {
     controlWindow = null;
   });
+}
+
+function focusControlWindow(): void {
+  if (!controlWindow || controlWindow.isDestroyed()) {
+    createControlWindow();
+  }
+
+  restoreControlWindowAfterOverlay();
+
+  if (controlWindow?.isMinimized()) {
+    controlWindow.restore();
+  }
+
+  controlWindow?.show();
+  controlWindow?.focus();
 }
 
 function createOverlayWindow(formatId: FormatPresetId): BrowserWindow {
@@ -755,15 +779,17 @@ function registerIpc(): void {
 }
 
 app.whenReady().then(() => {
+  if (!hasSingleInstanceLock) {
+    return;
+  }
+
   registerIpc();
   createControlWindow();
   registerHotkeys(loadSettings());
   configureAutoUpdates(() => controlWindow);
 
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createControlWindow();
-    }
+    focusControlWindow();
   });
 });
 

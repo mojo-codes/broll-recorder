@@ -203,6 +203,15 @@ export function App(): JSX.Element {
       setError(null);
       setNotice(null);
 
+      const latestState = await window.broll.getAppState();
+      setAppState(latestState);
+      if (latestState.permission.platform === "darwin" && latestState.permission.status !== "granted") {
+        setError(
+          "macOS blockiert die Bildschirmaufnahme. In Systemeinstellungen > Datenschutz & Sicherheit > Bildschirm & Systemaudio B-Roll Recorder einschalten und die App danach komplett neu öffnen."
+        );
+        return;
+      }
+
       if (!frameReady) {
         await showFrame();
         setNotice("Rahmen setzen und danach Aufnahme starten.");
@@ -263,6 +272,8 @@ export function App(): JSX.Element {
     return <div className="boot">B-Roll Recorder</div>;
   }
 
+  const canRecord = appState.permission.platform !== "darwin" || appState.permission.status === "granted";
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -302,8 +313,18 @@ export function App(): JSX.Element {
         </section>
       ) : null}
 
+      {settings.hasCompletedSetup && !canRecord ? (
+        <section className="setup-panel">
+          <div>
+            <h2>Bildschirm freigeben</h2>
+            <p>Nach dem Einschalten in macOS die App komplett beenden und neu öffnen.</p>
+          </div>
+          <PermissionStrip appState={appState} />
+        </section>
+      ) : null}
+
       <section className="work-surface" aria-label="Aufnahme">
-        <ControlGroup title="Format">
+        <ControlGroup title="Ausrichtung">
           <SegmentedChoices
             values={FORMAT_PRESETS}
             selected={formatId}
@@ -365,7 +386,7 @@ export function App(): JSX.Element {
                 void startRecording();
               }
             }}
-            disabled={recordingState === "countdown" || recordingState === "exporting"}
+            disabled={recordingState === "countdown" || recordingState === "exporting" || !canRecord}
           >
             {recordingState === "recording" ? <Square size={22} /> : <Circle size={22} />}
             {recordingState === "recording" ? "Stop" : "Aufnehmen"}
@@ -538,10 +559,10 @@ function PermissionStrip({ appState }: { appState: AppState }): JSX.Element {
 
   return (
     <div className={`permission-strip ${needsAction ? "needs-action" : ""}`}>
-      <span>Bildschirmaufnahme: {status}</span>
+      <span>{needsAction ? "Bildschirmaufnahme fehlt" : "Bildschirmaufnahme erlaubt"}</span>
       {needsAction ? (
         <button type="button" onClick={() => window.broll.openScreenSettings()}>
-          Öffnen
+          Systemeinstellungen öffnen
           <ExternalLink size={14} />
         </button>
       ) : null}
@@ -759,11 +780,11 @@ function cleanRecorderError(message: string): string {
   }
 
   if (/failed to get sources|Bildschirmquelle konnte nicht gelesen/i.test(cleaned)) {
-    return "Bildschirmaufnahme konnte nicht gestartet werden. Bitte macOS-Bildschirmaufnahme für B-Roll Recorder oder Electron erlauben und die App danach neu starten.";
+    return "Bildschirmaufnahme konnte nicht gestartet werden. In macOS unter Datenschutz & Sicherheit > Bildschirm & Systemaudio B-Roll Recorder einschalten. Wenn es schon aktiv ist: aus- und wieder einschalten, danach App neu öffnen.";
   }
 
   if (/permission|denied|not allowed/i.test(message)) {
-    return "Bildschirmaufnahme ist nicht erlaubt.";
+    return "Bildschirmaufnahme ist nicht erlaubt. Bitte B-Roll Recorder in den macOS-Einstellungen freigeben und danach neu öffnen.";
   }
 
   return cleaned;
@@ -771,14 +792,10 @@ function cleanRecorderError(message: string): string {
 
 function getQualityHelp(qualityId: QualityPresetId): string {
   if (qualityId === "standard") {
-    return "Normal: Für kurze Demos und einfache Scrolls. Kleinere Dateien.";
+    return "Normal: Gute Qualität für einfache Demos und kleinere Dateien.";
   }
 
-  if (qualityId === "sharp-ui") {
-    return "Text scharf: Für Websites, Code, Sheets und kleine UI-Schrift.";
-  }
-
-  return "Flüssig: Für Mausbewegungen, Animationen und schnelle Scrolls.";
+  return "Beste Qualität: Für kleine Schrift, Websites, Code, schnelle Mausbewegungen und Animationen. Größere Dateien.";
 }
 
 function getUpdateButtonLabel(status: UpdateStatus | null): string {

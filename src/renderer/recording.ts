@@ -23,9 +23,9 @@ export async function recordToFile(
     qualityId: options.qualityId
   });
   const stream = await getDesktopStream(config);
-  const { video, canvasStream, stopDrawing } = await createCroppedCanvasStream(stream, config);
+  const sourceSize = await getStreamVideoSize(stream);
   const mimeType = pickMimeType();
-  const recorder = new MediaRecorder(canvasStream, {
+  const recorder = new MediaRecorder(stream, {
     mimeType,
     videoBitsPerSecond: config.quality.videoBitsPerSecond
   });
@@ -105,17 +105,20 @@ export async function recordToFile(
       nameFields: options.nameFields,
       startedAtIso,
       sourceMode: config.sourceMode,
-      mimeType
+      mimeType,
+      captureArea: {
+        displayBounds: config.displayBounds,
+        frame: config.frame,
+        sourceWidth: sourceSize.width,
+        sourceHeight: sourceSize.height
+      }
     };
     return await window.broll.finalizeRecording(payload);
   } finally {
     await window.broll.hideRecordingControls().catch(() => undefined);
     await window.broll.hideRecordingFrame().catch(() => undefined);
     window.clearTimeout(autoStopTimer);
-    stopDrawing();
     stream.getTracks().forEach((track) => track.stop());
-    canvasStream.getTracks().forEach((track) => track.stop());
-    video.srcObject = null;
   }
 }
 
@@ -128,19 +131,13 @@ async function getDesktopStream(config: CaptureConfig): Promise<MediaStream> {
         chromeMediaSourceId: config.sourceId,
         maxFrameRate: config.quality.fps,
         minFrameRate: config.quality.fps
-      }
+      },
+      cursor: config.showCursor ? "always" : "never"
     } as MediaTrackConstraints
   } as MediaStreamConstraints);
 }
 
-async function createCroppedCanvasStream(
-  stream: MediaStream,
-  config: CaptureConfig
-): Promise<{
-  video: HTMLVideoElement;
-  canvasStream: MediaStream;
-  stopDrawing: () => void;
-}> {
+async function getStreamVideoSize(stream: MediaStream): Promise<{ width: number; height: number }> {
   const video = document.createElement("video");
   video.muted = true;
   video.playsInline = true;
@@ -148,56 +145,25 @@ async function createCroppedCanvasStream(
   await video.play();
   await waitForVideoSize(video);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = config.output.width;
-  canvas.height = config.output.height;
+  const size = {
+    width: video.videoWidth,
+    height: video.videoHeight
+  };
+  video.pause();
+  video.srcObject = null;
 
-  const context = canvas.getContext("2d", {
-    alpha: false,
-    desynchronized: true
-  });
-
-  if (!context) {
-    throw new Error("Canvas konnte nicht gestartet werden.");
+  if (!size.width || !size.height) {
+    const [track] = stream.getVideoTracks();
+    const settings = track?.getSettings();
+    if (settings?.width && settings.height) {
+      return {
+        width: settings.width,
+        height: settings.height
+      };
+    }
   }
 
-  context.imageSmoothingEnabled = true;
-  context.imageSmoothingQuality = "high";
-
-  const draw = () => {
-    drawCroppedFrame(context, video, config);
-  };
-
-  draw();
-  const drawInterval = window.setInterval(draw, Math.max(16, 1000 / config.quality.fps));
-
-  return {
-    video,
-    canvasStream: canvas.captureStream(config.quality.fps),
-    stopDrawing: () => {
-      window.clearInterval(drawInterval);
-    }
-  };
-}
-
-function drawCroppedFrame(
-  context: CanvasRenderingContext2D,
-  video: HTMLVideoElement,
-  config: CaptureConfig
-): void {
-  const relativeX = (config.frame.x - config.displayBounds.x) / config.displayBounds.width;
-  const relativeY = (config.frame.y - config.displayBounds.y) / config.displayBounds.height;
-  const relativeWidth = config.frame.width / config.displayBounds.width;
-  const relativeHeight = config.frame.height / config.displayBounds.height;
-
-  const sx = clamp(relativeX * video.videoWidth, 0, video.videoWidth);
-  const sy = clamp(relativeY * video.videoHeight, 0, video.videoHeight);
-  const sw = clamp(relativeWidth * video.videoWidth, 1, video.videoWidth - sx);
-  const sh = clamp(relativeHeight * video.videoHeight, 1, video.videoHeight - sy);
-
-  context.fillStyle = "#050505";
-  context.fillRect(0, 0, config.output.width, config.output.height);
-  context.drawImage(video, sx, sy, sw, sh, 0, 0, config.output.width, config.output.height);
+  return size;
 }
 
 function pickMimeType(): string {
@@ -213,8 +179,4 @@ function waitForVideoSize(video: HTMLVideoElement): Promise<void> {
   return new Promise((resolve) => {
     video.onloadedmetadata = () => resolve();
   });
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
 }

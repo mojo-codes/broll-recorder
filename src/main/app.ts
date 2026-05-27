@@ -297,9 +297,11 @@ function showRecordingControls(): void {
   window.setPosition(nextPosition.x, nextPosition.y);
   window.show();
   window.focus();
+  sendToWindowWhenReady(window, "recording:started");
 }
 
 function hideRecordingControls(): void {
+  recordingControlWindow?.webContents.send("recording:stopped");
   recordingControlWindow?.hide();
   hideRecordingFrameGuide();
 
@@ -310,6 +312,19 @@ function hideRecordingControls(): void {
     controlWindow.show();
     controlWindow.focus();
   }
+}
+
+function sendToWindowWhenReady(window: BrowserWindow, channel: string): void {
+  if (window.webContents.isLoadingMainFrame()) {
+    window.webContents.once("did-finish-load", () => {
+      if (!window.isDestroyed()) {
+        window.webContents.send(channel);
+      }
+    });
+    return;
+  }
+
+  window.webContents.send(channel);
 }
 
 function toggleRecordingFrameGuide(): boolean {

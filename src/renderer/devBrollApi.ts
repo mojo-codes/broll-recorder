@@ -123,6 +123,8 @@ export function installDevBrollApi(): void {
     onOverlayHidden: () => () => undefined,
     onRecordingPauseToggle: () => () => undefined,
     onRecordingFrameToggle: () => () => undefined,
+    onRecordingStarted: () => () => undefined,
+    onRecordingStopped: () => () => undefined,
     onRecordingPausedChanged: () => () => undefined,
     onUpdateStatus: () => () => undefined,
     onNotice: () => () => undefined

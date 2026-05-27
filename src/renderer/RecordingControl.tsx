@@ -5,14 +5,32 @@ export function RecordingControl(): JSX.Element {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [paused, setPaused] = useState(false);
   const [frameVisible, setFrameVisible] = useState(false);
+  const [active, setActive] = useState(true);
 
   useEffect(() => {
     const cleanupPaused = window.broll.onRecordingPausedChanged(setPaused);
-    return cleanupPaused;
+    const cleanupStarted = window.broll.onRecordingStarted(() => {
+      setElapsedSeconds(0);
+      setPaused(false);
+      setFrameVisible(false);
+      setActive(true);
+    });
+    const cleanupStopped = window.broll.onRecordingStopped(() => {
+      setActive(false);
+      setPaused(false);
+      setFrameVisible(false);
+      setElapsedSeconds(0);
+    });
+
+    return () => {
+      cleanupPaused();
+      cleanupStarted();
+      cleanupStopped();
+    };
   }, []);
 
   useEffect(() => {
-    if (paused) {
+    if (!active || paused) {
       return undefined;
     }
 

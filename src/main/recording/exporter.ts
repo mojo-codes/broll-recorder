@@ -5,7 +5,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import ffmpegPath from "ffmpeg-static";
 import ffprobeStatic from "ffprobe-static";
-import type { AppSettings, FinalizeRecordingPayload, RecordingResult } from "../../shared/types";
+import type { AppSettings, CaptureArea, FinalizeRecordingPayload, RecordingResult } from "../../shared/types";
 import { buildFileName, mergeNameFields } from "../../shared/naming";
 import { getFormatPreset, getQualityPreset } from "../../shared/presets";
 
@@ -51,13 +51,25 @@ export async function finalizeRecording(
   await fsp.writeFile(inputPath, Buffer.from(payload.buffer));
 
   try {
+    const inputProbe = await probeOutput(inputPath);
+    const inputStream = inputProbe.streams?.find((stream) => stream.codec_type === "video");
+    const captureArea =
+      payload.captureArea && inputStream?.width && inputStream.height
+        ? {
+            ...payload.captureArea,
+            sourceWidth: inputStream.width,
+            sourceHeight: inputStream.height
+          }
+        : payload.captureArea;
+    const videoFilter = buildVideoFilter(captureArea, format.width, format.height);
+
     await runProcess(resolvedFfmpegPath, [
       "-y",
       "-i",
       inputPath,
       "-an",
       "-vf",
-      `scale=${format.width}:${format.height}:flags=lanczos`,
+      videoFilter,
       "-r",
       String(quality.fps),
       "-c:v",
@@ -98,6 +110,40 @@ export async function finalizeRecording(
   } finally {
     await fsp.rm(inputPath, { force: true });
   }
+}
+
+function buildVideoFilter(
+  captureArea: CaptureArea | undefined,
+  outputWidth: number,
+  outputHeight: number
+): string {
+  if (!captureArea) {
+    return `scale=${outputWidth}:${outputHeight}:flags=lanczos`;
+  }
+
+  const crop = getCrop(captureArea);
+  return `crop=${crop.width}:${crop.height}:${crop.x}:${crop.y},scale=${outputWidth}:${outputHeight}:flags=lanczos`;
+}
+
+function getCrop(captureArea: CaptureArea): { x: number; y: number; width: number; height: number } {
+  const scaleX = captureArea.sourceWidth / captureArea.displayBounds.width;
+  const scaleY = captureArea.sourceHeight / captureArea.displayBounds.height;
+  const rawX = (captureArea.frame.x - captureArea.displayBounds.x) * scaleX;
+  const rawY = (captureArea.frame.y - captureArea.displayBounds.y) * scaleY;
+  const rawWidth = captureArea.frame.width * scaleX;
+  const rawHeight = captureArea.frame.height * scaleY;
+  const width = clampEven(Math.floor(rawWidth), 2, captureArea.sourceWidth);
+  const height = clampEven(Math.floor(rawHeight), 2, captureArea.sourceHeight);
+  const x = clampEven(Math.floor(rawX), 0, captureArea.sourceWidth - width);
+  const y = clampEven(Math.floor(rawY), 0, captureArea.sourceHeight - height);
+
+  return { x, y, width, height };
+}
+
+function clampEven(value: number, min: number, max: number): number {
+  const clamped = Math.min(Math.max(value, min), max);
+  const even = clamped - (clamped % 2);
+  return Math.max(min, even);
 }
 
 async function nextOutputPath(

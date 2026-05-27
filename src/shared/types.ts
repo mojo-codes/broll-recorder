@@ -75,6 +75,13 @@ export interface CaptureConfig {
   sourceMode: SourceMode;
 }
 
+export interface CaptureArea {
+  displayBounds: DisplayBounds;
+  frame: FrameRect;
+  sourceWidth: number;
+  sourceHeight: number;
+}
+
 export interface RecordingResult {
   outputPath: string;
   filename: string;
@@ -133,6 +140,7 @@ export interface FinalizeRecordingPayload {
   startedAtIso: string;
   sourceMode: SourceMode;
   mimeType: string;
+  captureArea?: CaptureArea;
 }
 
 export interface BrollApi {
@@ -168,6 +176,8 @@ export interface BrollApi {
   onOverlayHidden: (callback: (state: OverlayState) => void) => () => void;
   onRecordingPauseToggle: (callback: () => void) => () => void;
   onRecordingFrameToggle: (callback: () => void) => () => void;
+  onRecordingStarted: (callback: () => void) => () => void;
+  onRecordingStopped: (callback: () => void) => () => void;
   onRecordingPausedChanged: (callback: (paused: boolean) => void) => () => void;
   onUpdateStatus: (callback: (status: UpdateStatus) => void) => () => void;
   onNotice: (callback: (notice: string) => void) => () => void;

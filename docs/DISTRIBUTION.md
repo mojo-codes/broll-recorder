@@ -21,7 +21,7 @@ Hinweis: Das lokale Workflow-File braucht beim Push einen GitHub-Token mit `work
 
 Der GitHub-Workflow baut:
 
-- macOS als Universal-Build auf `macos-15-intel`
+- macOS als x64-Build auf `macos-15-intel`
 - Windows als x64-Installer
 
 ## Manuell von diesem Mac veröffentlichen

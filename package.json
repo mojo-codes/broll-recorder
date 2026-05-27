@@ -1,6 +1,6 @@
 {
   "name": "broll-recorder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple desktop recorder for reusable social media B-roll.",
   "author": "Mojo Makes",
   "main": "dist/main/app.js",
@@ -19,7 +19,7 @@
     "package": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
     "release:github": "npm run build && electron-builder --publish always",
-    "release:github:mac": "npm run build && electron-builder --mac --universal --publish always",
+    "release:github:mac": "npm run build && electron-builder --mac --x64 --publish always",
     "release:github:win": "npm run build && electron-builder --win --x64 --publish always"
   },
   "dependencies": {

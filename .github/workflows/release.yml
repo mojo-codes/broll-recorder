@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: macOS Universal
+          - name: macOS x64
             os: macos-15-intel
             build-command: npm run release:github:mac
           - name: Windows x64

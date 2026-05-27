@@ -46,6 +46,7 @@ let recordingFrameWindow: BrowserWindow | null = null;
 let recordingControlWindow: BrowserWindow | null = null;
 let activeFormatId: FormatPresetId = "vertical";
 let latestFrame: FrameRect | null = null;
+let latestFrameFormatId: FormatPresetId | null = null;
 let controlWindowHiddenForOverlay = false;
 
 initializeDiagnostics();
@@ -107,6 +108,7 @@ function createOverlayWindow(formatId: FormatPresetId): BrowserWindow {
   const display = screen.getPrimaryDisplay();
   activeFormatId = formatId;
   latestFrame = fitFrameToDisplay(formatId, display.bounds, String(display.id));
+  latestFrameFormatId = formatId;
 
   const window = new BrowserWindow({
     x: display.bounds.x,
@@ -255,10 +257,11 @@ function showOverlay(formatId: FormatPresetId): OverlayState {
   activeFormatId = formatId;
   const display = screen.getPrimaryDisplay();
 
-  if (!latestFrame || latestFrame.displayId !== String(display.id)) {
+  if (!latestFrame || latestFrame.displayId !== String(display.id) || latestFrameFormatId !== formatId) {
     latestFrame = fitFrameToDisplay(formatId, display.bounds, String(display.id));
+    latestFrameFormatId = formatId;
   } else {
-    latestFrame = fitExistingFrameToFormat(latestFrame, formatId, display.bounds);
+    latestFrame = clampFrame(latestFrame, display.bounds);
   }
 
   const window = overlayWindow ?? createOverlayWindow(formatId);
@@ -343,6 +346,7 @@ function showRecordingFrameGuide(): void {
 
   if (!latestFrame) {
     latestFrame = fitFrameToDisplay(activeFormatId, display.bounds, String(display.id));
+    latestFrameFormatId = activeFormatId;
   }
 
   window.setBounds(display.bounds);
@@ -360,6 +364,7 @@ function getOverlayState(): OverlayState {
 
   if (!latestFrame) {
     latestFrame = fitFrameToDisplay(activeFormatId, display.bounds, String(display.id));
+    latestFrameFormatId = activeFormatId;
   }
 
   return {
@@ -394,42 +399,6 @@ function fitFrameToDisplay(
     height: Math.round(height),
     displayId
   };
-}
-
-function fitExistingFrameToFormat(
-  frame: FrameRect,
-  formatId: FormatPresetId,
-  displayBounds: DisplayBounds
-): FrameRect {
-  const displayId = frame.displayId;
-  const centerX = frame.x + frame.width / 2;
-  const centerY = frame.y + frame.height / 2;
-  const format = getFormatPreset(formatId);
-  const aspect = format.width / format.height;
-  const sizeFromWidth = {
-    width: frame.width,
-    height: frame.width / aspect
-  };
-  const maxWidth = displayBounds.width - 48;
-  const maxHeight = displayBounds.height - 48;
-  let width = Math.min(sizeFromWidth.width, maxWidth);
-  let height = width / aspect;
-
-  if (height > maxHeight) {
-    height = maxHeight;
-    width = height * aspect;
-  }
-
-  return clampFrame(
-    {
-      x: Math.round(centerX - width / 2),
-      y: Math.round(centerY - height / 2),
-      width: Math.round(width),
-      height: Math.round(height),
-      displayId
-    },
-    displayBounds
-  );
 }
 
 function clampFrame(frame: FrameRect, displayBounds: DisplayBounds): FrameRect {
@@ -569,6 +538,10 @@ async function getCaptureConfig(formatId: FormatPresetId, qualityId: QualityPres
 
   if (!latestFrame) {
     latestFrame = fitFrameToDisplay(formatId, display.bounds, String(display.id));
+    latestFrameFormatId = formatId;
+  } else if (latestFrameFormatId !== formatId) {
+    latestFrame = fitFrameToDisplay(formatId, display.bounds, String(display.id));
+    latestFrameFormatId = formatId;
   }
 
   hideOverlay();
@@ -727,6 +700,7 @@ function registerIpc(): void {
   ipcMain.handle("overlay:update-frame", (_event, frame: FrameRect) => {
     const display = screen.getPrimaryDisplay();
     latestFrame = clampFrame(frame, display.bounds);
+    latestFrameFormatId = activeFormatId;
     return latestFrame;
   });
 

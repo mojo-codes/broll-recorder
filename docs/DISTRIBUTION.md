@@ -11,7 +11,7 @@ Luisa installiert die App einmal √ºber einen GitHub-Release-Download. Danach pr√
 3. Tag setzen und pushen:
 
 ```bash
-git tag v0.1.6
+git tag v0.1.7
 git push origin main --tags
 ```
 
@@ -47,12 +47,12 @@ Danach die macOS-Dateien mit den Release-Namen hochladen:
 
 ```bash
 mkdir -p /tmp/broll-release
-cp -p "release/B-Roll Recorder-0.1.6-mac-x64.dmg" /tmp/broll-release/B-Roll-Recorder-0.1.6-mac-x64.dmg
-cp -p "release/B-Roll Recorder-0.1.6-mac-x64.dmg.blockmap" /tmp/broll-release/B-Roll-Recorder-0.1.6-mac-x64.dmg.blockmap
-cp -p "release/B-Roll Recorder-0.1.6-mac-x64.zip" /tmp/broll-release/B-Roll-Recorder-0.1.6-mac-x64.zip
-cp -p "release/B-Roll Recorder-0.1.6-mac-x64.zip.blockmap" /tmp/broll-release/B-Roll-Recorder-0.1.6-mac-x64.zip.blockmap
+cp -p "release/B-Roll Recorder-0.1.7-mac-x64.dmg" /tmp/broll-release/B-Roll-Recorder-0.1.7-mac-x64.dmg
+cp -p "release/B-Roll Recorder-0.1.7-mac-x64.dmg.blockmap" /tmp/broll-release/B-Roll-Recorder-0.1.7-mac-x64.dmg.blockmap
+cp -p "release/B-Roll Recorder-0.1.7-mac-x64.zip" /tmp/broll-release/B-Roll-Recorder-0.1.7-mac-x64.zip
+cp -p "release/B-Roll Recorder-0.1.7-mac-x64.zip.blockmap" /tmp/broll-release/B-Roll-Recorder-0.1.7-mac-x64.zip.blockmap
 cp -p release/latest-mac.yml /tmp/broll-release/latest-mac.yml
-gh release upload v0.1.6 --repo mojo-codes/broll-recorder --clobber /tmp/broll-release/*
+gh release upload v0.1.7 --repo mojo-codes/broll-recorder --clobber /tmp/broll-release/*
 ```
 
 Die Versionsnummer im Beispiel bei neuen Releases entsprechend ersetzen.

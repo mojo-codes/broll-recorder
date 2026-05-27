@@ -11,7 +11,7 @@ Luisa installiert die App einmal über einen GitHub-Release-Download. Danach pr�
 3. Tag setzen und pushen:
 
 ```bash
-git tag v0.1.4
+git tag v0.1.5
 git push origin main --tags
 ```
 
@@ -44,7 +44,7 @@ Für Auto-Updates müssen die GitHub Releases öffentlich erreichbar sein. Bei p
 
 ## Professionelle Signierung
 
-Für wirklich reibungslose Installation auf fremden Rechnern braucht macOS eine Apple Developer ID mit Hardened Runtime, Notarization und Stapling. Windows funktioniert technisch ohne Zertifikat, zeigt dann aber häufiger SmartScreen-Warnungen; ein Code-Signing-Zertifikat reduziert das.
+Die macOS-Builds werden ohne Developer-ID-Zertifikat mindestens ad-hoc signiert, damit sie nicht komplett unsigniert sind. Für wirklich reibungslose Installation auf fremden Rechnern braucht macOS trotzdem eine Apple Developer ID mit Hardened Runtime, Notarization und Stapling. Windows funktioniert technisch ohne Zertifikat, zeigt dann aber häufiger SmartScreen-Warnungen; ein Code-Signing-Zertifikat reduziert das.
 
 ## Diagnose
 

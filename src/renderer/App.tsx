@@ -203,14 +203,7 @@ export function App(): JSX.Element {
       setError(null);
       setNotice(null);
 
-      const latestState = await window.broll.getAppState();
-      setAppState(latestState);
-      if (latestState.permission.platform === "darwin" && latestState.permission.status !== "granted") {
-        setError(
-          "macOS blockiert die Bildschirmaufnahme. In Systemeinstellungen > Datenschutz & Sicherheit > Bildschirm & Systemaudio B-Roll Recorder einschalten und die App danach komplett neu öffnen."
-        );
-        return;
-      }
+      await window.broll.getAppState().then(setAppState).catch(() => undefined);
 
       if (!frameReady) {
         await showFrame();
@@ -272,7 +265,7 @@ export function App(): JSX.Element {
     return <div className="boot">B-Roll Recorder</div>;
   }
 
-  const canRecord = appState.permission.platform !== "darwin" || appState.permission.status === "granted";
+  const permissionNeedsAction = appState.permission.platform === "darwin" && appState.permission.status !== "granted";
 
   return (
     <main className="app-shell">
@@ -313,11 +306,11 @@ export function App(): JSX.Element {
         </section>
       ) : null}
 
-      {settings.hasCompletedSetup && !canRecord ? (
+      {settings.hasCompletedSetup && permissionNeedsAction ? (
         <section className="setup-panel">
           <div>
-            <h2>Bildschirm freigeben</h2>
-            <p>Nach dem Einschalten in macOS die App komplett beenden und neu öffnen.</p>
+            <h2>macOS-Berechtigung prüfen</h2>
+            <p>Falls Aufnahme nicht startet: Freigabe einschalten, App komplett beenden und neu öffnen.</p>
           </div>
           <PermissionStrip appState={appState} />
         </section>
@@ -386,7 +379,7 @@ export function App(): JSX.Element {
                 void startRecording();
               }
             }}
-            disabled={recordingState === "countdown" || recordingState === "exporting" || !canRecord}
+            disabled={recordingState === "countdown" || recordingState === "exporting"}
           >
             {recordingState === "recording" ? <Square size={22} /> : <Circle size={22} />}
             {recordingState === "recording" ? "Stop" : "Aufnehmen"}
@@ -559,7 +552,7 @@ function PermissionStrip({ appState }: { appState: AppState }): JSX.Element {
 
   return (
     <div className={`permission-strip ${needsAction ? "needs-action" : ""}`}>
-      <span>{needsAction ? "Bildschirmaufnahme fehlt" : "Bildschirmaufnahme erlaubt"}</span>
+      <span>{needsAction ? "macOS meldet: Freigabe fehlt" : "Bildschirmaufnahme erlaubt"}</span>
       {needsAction ? (
         <button type="button" onClick={() => window.broll.openScreenSettings()}>
           Systemeinstellungen öffnen

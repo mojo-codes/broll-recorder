@@ -1,6 +1,6 @@
 {
   "name": "broll-recorder",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Simple desktop recorder for reusable social media B-roll.",
   "author": "Mojo Makes",
   "main": "dist/main/app.js",
@@ -65,6 +65,7 @@
       }
     ],
     "mac": {
+      "identity": "-",
       "category": "public.app-category.video",
       "target": [
         "dmg",

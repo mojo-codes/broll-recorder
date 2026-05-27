@@ -151,6 +151,7 @@ export interface BrollApi {
   hideOverlay: () => Promise<void>;
   getOverlayState: () => Promise<OverlayState>;
   updateFrame: (frame: FrameRect) => Promise<FrameRect>;
+  resetFrame: (formatId: FormatPresetId) => Promise<OverlayState>;
   getCaptureConfig: (payload: {
     formatId: FormatPresetId;
     qualityId: QualityPresetId;

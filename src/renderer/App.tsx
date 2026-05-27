@@ -110,8 +110,13 @@ export function App(): JSX.Element {
       }
     });
     const cleanupOverlayHidden = window.broll.onOverlayHidden((state) => {
+      const preset = getFormatPreset(state.formatId);
       setFrameReady(true);
-      setNotice(`Rahmen gesetzt: ${Math.round(state.frame.width)}x${Math.round(state.frame.height)}`);
+      setNotice(
+        `${preset.label}: Bildschirmbereich ${Math.round(state.frame.width)}x${Math.round(
+          state.frame.height
+        )}, Video ${preset.technicalLabel}`
+      );
     });
     const cleanupPause = window.broll.onRecordingPauseToggle(() => {
       pauseRecordingRef.current?.();
@@ -174,8 +179,11 @@ export function App(): JSX.Element {
   }, [formatId]);
 
   const selectFormat = useCallback((nextFormatId: FormatPresetId) => {
+    const preset = getFormatPreset(nextFormatId);
     setFormatId(nextFormatId);
     setFrameReady(false);
+    void window.broll.resetFrame(nextFormatId);
+    setNotice(`${preset.label}-Preset zurückgesetzt. Rahmen einmal prüfen.`);
   }, []);
 
   const checkUpdate = useCallback(async () => {

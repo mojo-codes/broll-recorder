@@ -1,4 +1,4 @@
-import { Check, X } from "lucide-react";
+import { Check, RotateCcw, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFormatPreset } from "../../shared/presets";
 import type { DisplayBounds, FrameRect, FormatPresetId, OverlayState } from "../../shared/types";
@@ -100,10 +100,24 @@ export function FrameOverlay({ mode = "edit" }: { mode?: "edit" | "guide" }): JS
     dragState.current = null;
   };
 
+  const resetToPreset = async () => {
+    if (!overlayState) {
+      return;
+    }
+
+    const nextState = await window.broll.resetFrame(overlayState.formatId);
+    setOverlayState(nextState);
+    setFrame(nextState.frame);
+  };
+
   return (
     <div className="overlay-root" onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
       {mode === "edit" ? (
         <div className="overlay-toolbar">
+          <button className="overlay-reset" type="button" onClick={resetToPreset}>
+            <RotateCcw size={16} />
+            Preset
+          </button>
           <button className="overlay-done" type="button" onClick={() => window.broll.hideOverlay()}>
             <Check size={17} />
             Fertig
@@ -126,8 +140,8 @@ export function FrameOverlay({ mode = "edit" }: { mode?: "edit" | "guide" }): JS
         {mode === "edit" ? (
           <button className="frame-move" type="button" onPointerDown={(event) => beginDrag("move", event)}>
             <span>{format.label}</span>
-            <small>{format.technicalLabel}</small>
-            <small>ziehen</small>
+            <small>Rahmen {Math.round(frame.width)}x{Math.round(frame.height)}</small>
+            <small>Video {format.technicalLabel}</small>
           </button>
         ) : null}
         {mode === "edit"

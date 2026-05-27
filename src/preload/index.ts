@@ -20,6 +20,7 @@ const api: BrollApi = {
   hideOverlay: () => ipcRenderer.invoke("overlay:hide"),
   getOverlayState: () => ipcRenderer.invoke("overlay:get-state"),
   updateFrame: (frame) => ipcRenderer.invoke("overlay:update-frame", frame),
+  resetFrame: (formatId) => ipcRenderer.invoke("overlay:reset-frame", formatId),
   getCaptureConfig: (payload) => ipcRenderer.invoke("recording:get-capture-config", payload),
   finalizeRecording: (payload) => ipcRenderer.invoke("recording:finalize", payload),
   showRecordingControls: () => ipcRenderer.invoke("recording:show-controls"),

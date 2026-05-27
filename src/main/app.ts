@@ -276,6 +276,18 @@ function showOverlay(formatId: FormatPresetId): OverlayState {
   return getOverlayState();
 }
 
+function resetFrame(formatId: FormatPresetId): OverlayState {
+  activeFormatId = formatId;
+  const display = screen.getPrimaryDisplay();
+  latestFrame = fitFrameToDisplay(formatId, display.bounds, String(display.id));
+  latestFrameFormatId = formatId;
+
+  const nextState = getOverlayState();
+  overlayWindow?.webContents.send("overlay:state-changed", nextState);
+  recordingFrameWindow?.webContents.send("overlay:state-changed", nextState);
+  return nextState;
+}
+
 function hideOverlay(): void {
   overlayWindow?.hide();
   restoreControlWindowAfterOverlay();
@@ -381,7 +393,7 @@ function fitFrameToDisplay(
 ): FrameRect {
   const format = getFormatPreset(formatId);
   const aspect = format.width / format.height;
-  const margin = 48;
+  const margin = 0;
   const maxWidth = displayBounds.width - margin;
   const maxHeight = displayBounds.height - margin;
   let width = maxWidth;
@@ -697,6 +709,7 @@ function registerIpc(): void {
   ipcMain.handle("overlay:show", (_event, formatId: FormatPresetId) => showOverlay(formatId));
   ipcMain.handle("overlay:hide", () => hideOverlay());
   ipcMain.handle("overlay:get-state", () => getOverlayState());
+  ipcMain.handle("overlay:reset-frame", (_event, formatId: FormatPresetId) => resetFrame(formatId));
   ipcMain.handle("overlay:update-frame", (_event, frame: FrameRect) => {
     const display = screen.getPrimaryDisplay();
     latestFrame = clampFrame(frame, display.bounds);

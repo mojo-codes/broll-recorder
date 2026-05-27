@@ -97,6 +97,10 @@ export function installDevBrollApi(): void {
     hideOverlay: async () => undefined,
     getOverlayState: async () => mockOverlay,
     updateFrame: async (frame: FrameRect) => frame,
+    resetFrame: async (formatId: FormatPresetId) => ({
+      ...mockOverlay,
+      formatId
+    }),
     getCaptureConfig: async () => {
       throw new Error("Aufnahme läuft nur in der Desktop-App.");
     },
